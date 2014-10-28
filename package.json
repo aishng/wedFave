@@ -1,0 +1,27 @@
+{
+  "name": "wedFave",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ashleyglidden/wedFave.git"
+  },
+  "author": "ashley glidden",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ashleyglidden/wedFave/issues"
+  },
+  "homepage": "https://github.com/ashleyglidden/wedFave",
+  "dependencies": {
+    "cookie-session": "^1.0.2",
+    "express": "^4.10.0",
+    "mongojs": "^0.15.1",
+    "passport": "^0.2.1",
+    "passport-oauth": "^1.0.0",
+    "util": "^0.10.3"
+  }
+}
