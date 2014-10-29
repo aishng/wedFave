@@ -22,6 +22,8 @@ var consumer_key = app.secrets.keyString,
   //create a new instance of the etsyAuth
   o = new etsyAuth(consumer_key, consumer_secret, "http://localhost:8080", callback);
 
+var query;
+
 //for express session
 app.use(session({secret: 'kitty kat'}));
 //create shortcut to static pages
@@ -31,6 +33,45 @@ app.use(express.static(__dirname + '/../views'));
 app.get('/', function(req, res) {
     res.render('./index.ejs');
 });
+
+
+app.get('/search', function(req, res) {
+    query = req.query.query;
+    //var listing_ids = [];
+    //var image_query = [];
+    o.getResource(req, res, 
+      "https://openapi.etsy.com/v2/listings/active/?keywords="+ query, function(raw_search_query) {
+        search_query = JSON.parse(raw_search_query);
+        // listing_images = search_query.results.forEach(function(listing) {
+        //   o.getResource(
+        //     req, 
+        //     res, 
+        //     "https://openapi.etsy.com/v2/listings/" + listing.listing_id + "/images",
+        //     function(raw_image_query) {
+        //       image_query = JSON.parse(raw_image_query)
+        //     }
+        //   )
+        // });
+
+        // for(i = 0; i < 25; i++) {
+        //   listing_ids.push(search_query.results[i].listing_id);
+        // }
+        res.render('./index.ejs', search_query);
+        //res.send(search_query);
+        // console.log(listing_ids);
+    });
+    //res.send(image_query);
+    // res.render('./index.ejs', search_query);
+});
+
+ //   for(i = 0; i <= listing_ids.length; i++) {
+      //     listing_images_api = "https://openapi.etsy.com/v2/listings/" + listing_ids[i] + "/images";
+      //     o.getResource(req, res, listing_images_api, function(raw_image_query) {
+      //       image_query.push(JSON.parse(raw_image_query));
+      //       //console.log('image_query: '+ image_query);
+      //       //res.send(image_query);
+      //   });
+      // }
 
 
 //when the go to the APIentry they are rerouted to etsy's site to approve the app
@@ -46,9 +87,75 @@ app.get( callback, function( req, res ) {
     });
 });
 
+//predetermined search buttons: dresses
+app.get('/dresses', function(req, res) {
+    o.getResource(req, res, 
+      "https://openapi.etsy.com/v2/listings/active/?keywords=vintage+weddingdresses", 
+      function(raw_search_query){
+        search_query = JSON.parse(raw_search_query);
+        //res.send(search_query);
+        res.render('./index.ejs', search_query);
+    })
+});
+
+//predetermined search buttons: veils
+app.get('/veils', function(req, res) {
+    o.getResource(req, res, 
+      "https://openapi.etsy.com/v2/listings/active/?keywords=birdcage+veils", 
+      function(raw_search_query){
+        search_query = JSON.parse(raw_search_query);
+        //res.send(search_query);
+        res.render('./index.ejs', search_query);
+    })
+});
+
+//predetermined search buttons: flower crowns
+app.get('/crowns', function(req, res) {
+    o.getResource(req, res, 
+      "https://openapi.etsy.com/v2/listings/active/?keywords=wedding+flower+crowns", 
+      function(raw_search_query){
+        search_query = JSON.parse(raw_search_query);
+        //res.send(search_query);
+        res.render('./index.ejs', search_query);
+    })
+});
+
+//predetermined search buttons: mason jars
+app.get('/jars', function(req, res) {
+    o.getResource(req, res, 
+      "https://openapi.etsy.com/v2/listings/active/?keywords=wedding+mason+jars", 
+      function(raw_search_query){
+        search_query = JSON.parse(raw_search_query);
+        //res.send(search_query);
+        res.render('./index.ejs', search_query);
+    })
+});
+
+//predetermined search buttons: placecards
+app.get('/placecards', function(req, res) {
+    o.getResource(req, res, 
+      "https://openapi.etsy.com/v2/listings/active/?keywords=wedding+placecards", 
+      function(raw_search_query){
+        search_query = JSON.parse(raw_search_query);
+        //res.send(search_query);
+        res.render('./index.ejs', search_query);
+    })
+});
+
+//predetermined search buttons: string market lights
+app.get('/lights', function(req, res) {
+    o.getResource(req, res, 
+      "https://openapi.etsy.com/v2/listings/active/?keywords=wedding+market+lights", 
+      function(raw_search_query){
+        search_query = JSON.parse(raw_search_query);
+        //res.send(search_query);
+        res.render('./index.ejs', search_query);
+    })
+});
+
 //when we hit /me (which is redirect to at the end of the getAccessToken function)
 //we call the getResource function which accesses data from the Etsy API
-app.get( "/me", function(req, res) {
+app.get( "/my_favorite_listings", function(req, res) {
   //here we access the user data of myself
   o.getResource(req, res, "https://openapi.etsy.com/v2/users/__SELF__", function(raw_user_data) {
     //the data comes in raw, so we must parse it to read it as JSON

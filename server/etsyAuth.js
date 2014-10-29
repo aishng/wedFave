@@ -62,7 +62,7 @@ module.exports = function etsyAuth( key, secret, domain, callback ) {
                         req.session.oauth.access_token = token;
                         req.session.oauth.access_token_secret = token_secret;
                         if ( callback ) callback.call( this, req, res );
-                        res.redirect("/me")
+                        res.redirect("/my_favorite_listings")
                     }
                 }
             );

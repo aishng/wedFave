@@ -6,12 +6,30 @@
  	<link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-	<!-- <form class="search" method="GET" action="/">
-		<input name="query" placeholder="Search"></input>
-	</form> -->
 	<div>
 		<a href="/auth/etsy"><button>Sign In With Etsy</button></a>
-	</div>
+		<form class="search" method="GET" action="/search">
+			<input name="query" placeholder="Search"></input>
+		</form>
+		<a href="/dresses"><button>Wedding Dresses</button></a>
+		<a href="/veils"><button>Veils</button></a>
+		<a href="/crowns"><button>Flower Crowns</button></a>
+		<a href="/jars"><button>Mason Jars</button></a>
+		<a href="/placecards"><button>Placecards</button></a>
+		<a href="/lights"><button>String Lights</button></a>
+		<a href="/my_favorite_listings"><button>My Favorite Listings</button></a>
+		<div>
+			<% for (var i = 0; i < search_query.results.length; i++) { %>
+			<div class="searchResult">
+				<div class="title"><%= search_query.results[i].title %> </div>
+				<!--<div class="description"><%= search_query.results[i].description %> </div> -->
+				<div class="price"><%= search_query.results[i].price %> </div>
+				<div class="url"><%= search_query.results[i].url %> </div>
+				<div class="num_fav"><%= search_query.results[i].num_favorers %> </div>
+				<a href="/favorite"><button>FAVORITE</button></a>
+			</div>
+			<% } %>
+		</div>
 	<script>
 	</script>
 </body>
