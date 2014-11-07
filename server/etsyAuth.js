@@ -80,10 +80,22 @@ module.exports = function etsyAuth( key, secret, domain, callback ) {
   		user_secret = request.session.oauth.access_token_secret;
   		//send the keys and call a callback function
     	this.o.get(url, user_token, user_secret, function (err, data, res) {
-    		//use the data from the get request in the callback function
+            //use the data from the get request in the callback function
     		callback(data)
     	});
     };
 
+    //this function allows us to postResources to the API
+    this.postResource = function(request, response, url, callback){
+    	//we need to send our token and secret to verify its us to the API
+    	user_token = request.session.oauth.access_token;
+  		user_secret = request.session.oauth.access_token_secret;
+  		//send the keys and call a callback function
+    	this.o.post(url, user_token, user_secret, function (err, data, res) {
+    		//use the data from the get request in the callback function
+    		callback(data)
+    	});
+    };
+    
     return this;
 }

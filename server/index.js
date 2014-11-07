@@ -9,6 +9,8 @@ https             = require('https'),
 secrets           = require('./secrets')(app),
 etsyAuth          = require('./etsyAuth');
 
+//http.globalAgent.maxSockets = 1;
+
 app.server = http.Server(app);
 
 //create middleware 'loggedin' router to handle all routes for signed in user
@@ -31,47 +33,42 @@ app.use(express.static(__dirname + '/../views'));
 
 //at the root we render our index
 app.get('/', function(req, res) {
-    res.render('./index.ejs');
+    res.render('./login.ejs');
 });
 
+var listing_ids = [];
+var image_query = [];
 
 app.get('/search', function(req, res) {
     query = req.query.query;
-    //var listing_ids = [];
-    //var image_query = [];
     o.getResource(req, res, 
       "https://openapi.etsy.com/v2/listings/active/?keywords="+ query, function(raw_search_query) {
         search_query = JSON.parse(raw_search_query);
-        // listing_images = search_query.results.forEach(function(listing) {
-        //   o.getResource(
-        //     req, 
-        //     res, 
-        //     "https://openapi.etsy.com/v2/listings/" + listing.listing_id + "/images",
-        //     function(raw_image_query) {
-        //       image_query = JSON.parse(raw_image_query)
-        //     }
-        //   )
-        // });
 
-        // for(i = 0; i < 25; i++) {
-        //   listing_ids.push(search_query.results[i].listing_id);
-        // }
-        res.render('./index.ejs', search_query);
-        //res.send(search_query);
-        // console.log(listing_ids);
-    });
+        for(i = 0; i < 25; i++) {
+          listing_ids.push(search_query.results[i].listing_id);
+        }
+
+        (function throttleRequests() {
+          console.log("in set timeout func");
+          id = listing_ids.shift();
+          o.getResource(req, res, "https://openapi.etsy.com/v2/listings/" + id + "/images", function(raw_image_query) {
+            console.log("in get resource");
+            image_query.push(JSON.parse(raw_image_query));
+            console.log(image_query);
+
+            // counter --;
+            if (listing_ids.length > 0) {
+              setTimeout(throttleRequests, 200);
+            } else {
+              res.render('./index.ejs', search_query);
+            }
+          });
+        })();
+        // res.render('./index.ejs', search_query);
+   });
     //res.send(image_query);
-    // res.render('./index.ejs', search_query);
 });
-
- //   for(i = 0; i <= listing_ids.length; i++) {
-      //     listing_images_api = "https://openapi.etsy.com/v2/listings/" + listing_ids[i] + "/images";
-      //     o.getResource(req, res, listing_images_api, function(raw_image_query) {
-      //       image_query.push(JSON.parse(raw_image_query));
-      //       //console.log('image_query: '+ image_query);
-      //       //res.send(image_query);
-      //   });
-      // }
 
 
 //when the go to the APIentry they are rerouted to etsy's site to approve the app
@@ -151,6 +148,26 @@ app.get('/lights', function(req, res) {
         //res.send(search_query);
         res.render('./index.ejs', search_query);
     })
+});
+
+//this should POST to your acct the new favorited item
+//need to figure out best way to intake the :listing_id
+app.get('/favorite', function(req, res) {
+    console.log(req.query.id);
+    o.getResource(req, res, "https://openapi.etsy.com/v2/users/__SELF__", function(raw_user_data) {
+    //the data comes in raw, so we must parse it to read it as JSON
+    user_data = JSON.parse(raw_user_data);
+    //we need to target the user_id for the next request
+    user_id = user_data.results[0].user_id;
+    //we want to get all of my favorite listings from the API
+    favorite_listings_url = "https://openapi.etsy.com/v2/users/" + user_id + "/favorites/listings"
+    //call the getResource function again to receive the new data
+    o.getResource(req, res, 
+      "https://openapi.etsy.com/v2/users/" + user_id + "/favorites/listings/" + req.query.id,
+      function(){
+        res.render('./index.ejs');
+    })
+  });
 });
 
 //when we hit /me (which is redirect to at the end of the getAccessToken function)
